@@ -1,5 +1,5 @@
 # Trabajo final de Estadística Computacional
-El trabajo consiste en realizar un documento tipo *vignette* en el que se van a utilizar los paquetes `pdftools`, `tokenizers` y `tidyverse` para analizar las principales diferencias entre las obras más famosas de prosa, poesía y teatro escritas en España durante el siglo XVII.
+El trabajo consiste en realizar un documento tipo *vignette* en el que se van a utilizar los paquetes `pdftools`, `tokenizers`, `stopwords` y `tidyverse` para analizar las principales diferencias entre las obras más famosas de prosa, poesía y teatro escritas en España durante el siglo XVII.
 
 Las obras que se han escogido son:
 
