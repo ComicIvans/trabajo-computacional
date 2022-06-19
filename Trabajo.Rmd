@@ -1,0 +1,69 @@
+---
+title: "Trabajo final de Estadística Computacional"
+author: "Pedro Alumbreros Menchén, Elena Merelo Molina, Iván Salido Cobo y Rubén Vílchez Valenzuela"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::downcute:
+  code_folding: show
+self_contained: true
+thumbnails: false
+lightbox: true
+downcute_theme: "chaos"
+pkgdown:
+  as_is: true
+vignette: >
+  %\VignetteIndexEntry{Trabajo final de Estadística Computacional}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+# Análisis del lenguaje utilizado en la prosa, poesía y el teatro del Siglo de Oro español.
+Nuestro objetivo es analizar las principales diferencias entre las obras más famosas de prosa, poesía y teatro escritas en España durante el siglo XVII.
+
+Las obras escogidas son:
+
+- **Prosa:**
+  - El ingenioso hidalgo Don Quijote de la Mancha
+  - El ingenioso caballero Don Quijote de la Mancha
+- **Poesía:**
+  - Algo de Quevedo suupongo.
+- **Teatro:**
+  - La vida es sueño.
+
+## Cargando los datos.
+
+Primero necesitamos extraer las palabras de los PDFs. Para ello vamos a utilizar el paquete `pdftools`.
+
+```{r }
+library(pdftools)
+```
+
+Ahora generamos una lista con todos los PDFs que haya en el directorio de trabajo.
+
+```{r }
+pdfs <- list.files(pattern = "pdf$")
+```
+
+El paguete `pdftools` permite leer el texto de un PDF con la función `pdf_text`.
+Vamos a leer el texto de todos los PDFs utilizando `lapply`.
+
+```{r }
+texto <- lapply(pdfs, pdf_text)
+```
+
+Con esto, `texto` es una lista con los distintos PDFs. Cada elemento de la lista
+es un vector con tantos elementos como páginas tenga el PDF y, en cada elemento,
+el texto que haya en esa página del PDF.
+
+Para facilitar la posterior lectura del texto, vamos a juntar el texto de todas las páginas de los PDFs en un solo elemento.
+
+```{r }
+obras <- lapply(texto, paste0)
+```
+
+## Tokenizando los datos cargados.
+
+asfdasf
+
+## Analizando los datos.
+
+asfdasf
