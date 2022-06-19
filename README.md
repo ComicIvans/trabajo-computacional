@@ -4,10 +4,10 @@ El trabajo consiste en realizar un documento tipo *vignette* en el que se van a 
 Las obras que se han escogido son:
 
 - **Prosa:**
-  - El ingenioso hidalgo Don Quijote de la Mancha
-  - El ingenioso caballero Don Quijote de la Mancha
+  - El ingenioso hidalgo Don Quijote de la Mancha.
+  - El ingenioso caballero Don Quijote de la Mancha.
 - **Poesía:**
-  - Algo de Quevedo suupongo.
+  - La Divina comedia.
 - **Teatro:**
   - La vida es sueño.
 

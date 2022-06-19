@@ -1497,16 +1497,17 @@ Prism.languages.r={comment:/#.*/,string:{pattern:/(['"])(?:\\.|(?!\1)[^\\\r\n])*
         <div class="Sidebar">
           <div class="SidebarItems" id="toc">
             <ul>
-            <li><a href="#análisis-del-lenguaje-utilizado-en-la-prosa-poesía-y-el-teatro-del-siglo-de-oro-español.">Análisis
-            del lenguaje utilizado en la prosa, poesía y el teatro del
-            Siglo de Oro español.</a>
+            <li><a href="#análisis-del-texto-de-distintas-obras-de-prosa-poesía-y-teatro-del-siglo-de-oro-español">Análisis
+            del texto de distintas obras de prosa, poesía y teatro del
+            Siglo de Oro español</a>
             <ul>
-            <li><a href="#cargando-los-datos.">Cargando los
-            datos.</a></li>
-            <li><a href="#tokenizando-los-datos-cargados.">Tokenizando
-            los datos cargados.</a></li>
-            <li><a href="#analizando-los-datos.">Analizando los
-            datos.</a></li>
+            <li><a href="#paquetes-utilizados">Paquetes
+            utilizados</a></li>
+            <li><a href="#leyendo-los-pdfs">Leyendo los PDFs</a></li>
+            <li><a href="#preparando-los-datos">Preparando los
+            datos</a></li>
+            <li><a href="#analizando-los-datos">Analizando los
+            datos</a></li>
             </ul></li>
             </ul>
           </div>
@@ -1532,12 +1533,12 @@ Vílchez Valenzuela
    
 <!-- Don't indent these lines or it will mess pre blocks indentation --> 
 <div class="page-content has-page-title">
-<div id="análisis-del-lenguaje-utilizado-en-la-prosa-poesía-y-el-teatro-del-siglo-de-oro-español." class="section level1">
-<h1>Análisis del lenguaje utilizado en la prosa, poesía y el teatro del
-Siglo de Oro español.</h1>
-<p>Nuestro objetivo es analizar las principales diferencias entre las
-obras más famosas de prosa, poesía y teatro escritas en España durante
-el siglo XVII.</p>
+<div id="análisis-del-texto-de-distintas-obras-de-prosa-poesía-y-teatro-del-siglo-de-oro-español" class="section level1">
+<h1>Análisis del texto de distintas obras de prosa, poesía y teatro del
+Siglo de Oro español</h1>
+<p>El objetivo es analizar las principales diferencias entre las obras
+más famosas de prosa, poesía y teatro escritas en España durante el
+siglo XVII.</p>
 <p>Las obras escogidas son:</p>
 <ul>
 <li><strong>Prosa:</strong>
@@ -1547,40 +1548,200 @@ el siglo XVII.</p>
 </ul></li>
 <li><strong>Poesía:</strong>
 <ul>
-<li>Algo de Quevedo suupongo.</li>
+<li>La Divina comedia.</li>
 </ul></li>
 <li><strong>Teatro:</strong>
 <ul>
 <li>La vida es sueño.</li>
 </ul></li>
 </ul>
-<div id="cargando-los-datos." class="section level2">
-<h2>Cargando los datos.</h2>
-<p>Primero necesitamos extraer las palabras de los PDFs. Para ello vamos
-a utilizar el paquete <code>pdftools</code>.</p>
-<pre class="r"><code>library(pdftools)</code></pre>
+<div id="paquetes-utilizados" class="section level2">
+<h2>Paquetes utilizados</h2>
+<p>Como las obras están en PDF, se hará uso del paquete
+<code>pdftools</code> para extraer el texto.</p>
+<p>Después, se usarán los paquetes <code>tokenizers</code> y
+<code>stopwords</code> para descomponer el texto y filtrar ciertas
+palabras.</p>
+<p>Por último, se analizarán los datos resultantes con el paquete
+<code>tidyverse</code>.</p>
+<pre class="r"><code>library(tokenizers)
+options(max.print = 4)
+library(pdftools)</code></pre>
 <pre><code>## Using poppler version 22.02.0</code></pre>
-<p>Ahora generamos una lista con todos los PDFs que haya en el
-directorio de trabajo.</p>
-<pre class="r"><code>pdfs &lt;- list.files(pattern = &quot;pdf$&quot;)</code></pre>
-<p>El paguete <code>pdftools</code> permite leer el texto de un PDF con
-la función <code>pdf_text</code>. Vamos a leer el texto de todos los
-PDFs utilizando <code>lapply</code>.</p>
-<pre class="r"><code>texto &lt;- lapply(pdfs, pdf_text)</code></pre>
-<p>Con esto, <code>texto</code> es una lista con los distintos PDFs.
-Cada elemento de la lista es un vector con tantos elementos como páginas
-tenga el PDF y, en cada elemento, el texto que haya en esa página del
+<pre class="r"><code>library(stopwords)</code></pre>
+</div>
+<div id="leyendo-los-pdfs" class="section level2">
+<h2>Leyendo los PDFs</h2>
+<p>En una lista se almacenan los PDFs que haya en el directorio de
+trabajo. El paguete <code>pdftools</code> permite leer el texto de un
+PDF con la función <code>pdf_text</code>. Se continúa leyendo el texto
+de todos los PDFs utilizando <code>lapply</code>.</p>
+<pre class="r"><code>pdfs &lt;- list.files(pattern = &quot;pdf$&quot;)
+libros &lt;- lapply(pdfs, pdf_text)
+names(libros) &lt;- c(&quot;DivinaComedia&quot;, &quot;Quijote1&quot;, &quot;Quijote2&quot;, &quot;VidaEsSueño&quot;) </code></pre>
+<p>Donde <code>libros</code> es una lista con los PDFs. Cada elemento de
+la lista (cada libro) es un vector con tantos elementos como páginas
+tenga el PDF y en cada elemento el texto que haya en esa página del
 PDF.</p>
-<p>Para facilitar la posterior lectura del texto, vamos a juntar el
-texto de todas las páginas de los PDFs en un solo elemento.</p>
-<pre class="r"><code>obras &lt;- lapply(texto, paste0)</code></pre>
 </div>
-<div id="tokenizando-los-datos-cargados." class="section level2">
-<h2>Tokenizando los datos cargados.</h2>
-<p>asfdasf</p>
+<div id="preparando-los-datos" class="section level2">
+<h2>Preparando los datos</h2>
+<p>Ahora es necesario <em>tokenizar</em> el texto leído.</p>
+<p>El proceso de <em>tokenización</em> consiste en descomponer una
+cadena de texto en <em>tokens</em>, esto es, elementos más pequeños
+computables. Un ejemplo sería la descomposición del texto en palabras o
+en letras. Por otro lado, se usarán herramientas para procesar textos en
+distintos formatos con el fin de facilitar su manipulación.</p>
+<p>Con la función <code>tokenize_words</code> se extraen y se almacenan
+las palabras.</p>
+<pre class="r"><code>palabxpag_lib &lt;- lapply(libros, tokenize_words) 
+palab_lib &lt;- lapply(palabxpag_lib, unlist)
+palab_lib</code></pre>
+<pre><code>## $DivinaComedia
+## [1] &quot;divina&quot;  &quot;comedia&quot; &quot;por&quot;     &quot;dante&quot;  
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 96522 entries ]
+## 
+## $Quijote1
+## [1] &quot;capítulo&quot; &quot;i&quot;        &quot;que&quot;      &quot;trata&quot;   
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 375341 entries ]
+## 
+## $Quijote2
+## [1] &quot;capítulo&quot; &quot;i&quot;        &quot;de&quot;       &quot;lo&quot;      
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 191791 entries ]
+## 
+## $VidaEsSueño
+## [1] &quot;personajes&quot; &quot;rosaura&quot;    &quot;dama&quot;       &quot;segismundo&quot;
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 17497 entries ]</code></pre>
+<p>Donde <code>palab_libro</code> es una lista de vectores con todas las
+palabras de cada libro. A la hora de extraer las palabras, podemos
+además especificar un vector de palabras vacías <em>(palabras que no
+tienen un significado por sí solas, como pueden ser artículos,
+pronombres, preposiciones, adverbios, …)</em>, que se omitirán. Para
+esto es útil el paquete <code>stopwords</code>, que contiene las
+palabras vacías o <em>stopwords</em> para distintos idiomas. El idioma
+se especifica como argumento en forma de su código ISO 639-1, por
+ejemplo, para el español, se usa el código <code>&quot;es&quot;</code>. Un ejemplo
+donde extraemos las palabras de un libro especificando palabras vacías
+del español con ayuda del paquete stopwords:</p>
+<pre class="r"><code>pvacias &lt;- tokenize_words(libros[[1]], stopwords = stopwords::stopwords(&quot;es&quot;))
+pvacias[[1]]</code></pre>
+<pre><code>## [1] &quot;divina&quot;    &quot;comedia&quot;   &quot;dante&quot;     &quot;alighieri&quot;</code></pre>
+<p>Otra opción a la hora de analizar las palabras de un texto es tomar
+las raíces de las palabras en lugar de las palabras completas, lo cual
+da pie a más formas de estudiar un texto desde el punto de vista
+lingüístico. Esto se puede conseguir con ayuda de la función
+<code>tokenize_word_stems</code>:</p>
+<pre class="r"><code>raizpalabxpag_lib &lt;- lapply(libros, tokenize_word_stems) 
+raizpalab_lib &lt;- lapply(raizpalabxpag_lib, unlist)
+raizpalab_lib</code></pre>
+<pre><code>## $DivinaComedia
+## [1] &quot;divina&quot;  &quot;comedia&quot; &quot;por&quot;     &quot;dant&quot;   
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 96522 entries ]
+## 
+## $Quijote1
+## [1] &quot;capítulo&quot; &quot;i&quot;        &quot;que&quot;      &quot;trata&quot;   
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 375341 entries ]
+## 
+## $Quijote2
+## [1] &quot;capítulo&quot; &quot;i&quot;        &quot;de&quot;       &quot;lo&quot;      
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 191791 entries ]
+## 
+## $VidaEsSueño
+## [1] &quot;personaj&quot;   &quot;rosaura&quot;    &quot;dama&quot;       &quot;segismundo&quot;
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 17497 entries ]</code></pre>
+<p>No solo nos quedamos en las palabras, si no que además podemos tomar
+el texto y separarlo en todas las letras que lo componen, que son los
+menores <em>tokens</em> que podremos encontrar.</p>
+<pre class="r"><code>letrasxpag_lib &lt;- lapply(libros, tokenize_characters)
+letras_lib &lt;- lapply(letrasxpag_lib, unlist)
+letras_lib</code></pre>
+<pre><code>## $DivinaComedia
+## [1] &quot;d&quot; &quot;i&quot; &quot;v&quot; &quot;i&quot;
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 408316 entries ]
+## 
+## $Quijote1
+## [1] &quot;c&quot; &quot;a&quot; &quot;p&quot; &quot;í&quot;
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 1613859 entries ]
+## 
+## $Quijote2
+## [1] &quot;c&quot; &quot;a&quot; &quot;p&quot; &quot;í&quot;
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 826839 entries ]
+## 
+## $VidaEsSueño
+## [1] &quot;p&quot; &quot;e&quot; &quot;r&quot; &quot;s&quot;
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 75816 entries ]</code></pre>
+<p>En el paquete encontramos otra función que permite dividir el texto
+en partes más pequeñas de igual longitud.</p>
+<pre class="r"><code>texto &lt;- chunk_text(libros$Quijote1[7], chunk_size = 80)
+texto[2:5]</code></pre>
+<pre><code>## [[1]]
+## [1] &quot;de damas tan bien servido como fuera don quijote cuando de su aldea vino doncellas curaban dél princesas del su rocino o rocinante que éste es el nombre señoras mías de mi caballo y don quijote de la mancha el mío que puesto que no quisiera descubrirme fasta que las fazañas fechas en vuestro servicio y pro me descubrieran la fuerza de acomodar al propósito presente este romance viejo de lanzarote ha sido causa que sepáis mi nombre antes de&quot;
+## 
+## [[2]]
+## [1] &quot;toda sazón pero tiempo vendrá en que las vuestras señorías me manden y yo obedezca y el valor de mi brazo descubra el deseo que tengo de serviros las mozas que no estaban hechas a oír semejantes retóricas no respondían palabra sólo le preguntaron si quería comer alguna cosa cualquiera yantaría yo respondió don quijote porque a lo que entiendo me haría mucho al caso a dicha acertó a ser viernes aquel día y no había en toda la venta&quot;
+## 
+## [[3]]
+## [1] &quot;sino unas raciones de un pescado que en castilla llaman abadejo y en andalucía bacallao y en otras partes curadillo y en otras truchuela preguntáronle si por ventura comería su merced truchuela que no había otro pescado que dalle a comer como haya muchas truchuelas respondió don quijote podrán servir de una trucha porque eso se me da que me den ocho reales en sencillos que en una pieza de a ocho cuanto más que podría ser que fuesen estas&quot;
+## 
+## [[4]]
+## [1] &quot;truchuelas como la ternera que es mejor que la vaca y el cabrito que el cabrón pero sea lo que fuere venga luego que el trabajo y peso de las armas no se puede llevar sin el gobierno de las tripas pusiéronle la mesa a la puerta de la venta por el fresco y trújole el huésped una porción del mal remojado y peor cocido bacallao y un pan tan negro y mugriento como sus armas pero era materia de&quot;</code></pre>
+<p>También se pueden separar párrafos y frases con las funciones
+<code>tokenize_sentences</code> y <code>tokenize_paragraphs</code>
+respectivamente. Vemos un ejemplo de separación de frases.</p>
+<pre class="r"><code>tokenize_sentences(libros$Quijote1[[20]])</code></pre>
+<pre><code>## [[1]]
+## [1] &quot;los que se hallaren que tratan destas cosas de Francia, se echen y depositen en un pozo seco, hasta que con más acuerdo se vea lo que se ha de hacer dellos, exceptuando a un Bernardo del Carpio que anda por ahí, y a otro llamado Roncesvalles; que éstos, en llegando a mis manos, han de estar en las del ama, y dellas en las del fuego, sin remisión alguna.&quot;                                                                                                  
+## [2] &quot;Todo lo confirmó el barbero, y lo tuvo por bien y por cosa muy acertada, por entender que era el cura tan buen cristiano y tan amigo de la verdad, que no diría otra cosa por todas las del mundo.&quot;                                                                                                                                                                                                                                                                   
+## [3] &quot;Y abriendo otro libro, vio que era Palmerín de Oliva, y junto a él estaba otro que se llamaba Palmerín de Ingalaterra; lo cual visto por el licenciado, dijo: Esa oliva se haga luego rajas y se queme, que aun no queden della las cenizas: y esa palma de Ingalaterra se guarde y se conserve como a cosa única, y se haga para ello otra caja como la que halló Alejandro en los despojos de Darío, que la diputó para guardar en ella las obras del poeta Homero.&quot;
+## [4] &quot;Este libro, señor compadre, tiene autoridad por dos cosas: la una, porque él por sí es muy bueno; y la otra, porque es fama que le compuso un discreto rey de Portugal.&quot;                                                                                                                                                                                                                                                                                              
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 15 entries ]</code></pre>
+<p>Además se pueden contar letras, palabras o frases de un texto con las
+funciones <code>count_words</code>, <code>count_characters</code> y
+<code>count_sentences</code> respectivamente. Aunque es posible
+<em>tokenizar</em> el texto con las funciones ya vistas y computar la
+longitud de los vectores obtenidos, estas funciones nos ofrecen un
+recuento de forma directa si no queremos dar pasos intermedios. Contamos
+las palabras de una página del <code>Quijote2</code>:</p>
+<pre class="r"><code>count_words(libros$Quijote2[[9]])</code></pre>
+<pre><code>## [1] 461</code></pre>
+<p>Otra opción a la hora de <em>tokenizar</em> el texto, igual que tomar
+frases, palabras, o párrafos, es tomar <em>n-gramas</em>: subsecuencias
+de a lo sumo <em>n</em> elementos contiguos de una secuencia dada, y
+como mínimo <em>n_min</em> elementos. En este caso es también posible
+utilizar la opción de excluir palabras vacías si se desea. Veamos un
+ejemplo donde tomamos <em>n-gramas</em> de entre <em>1</em> y <em>6</em>
+palabras:</p>
+<pre class="r"><code>ngrama &lt;- tokenize_ngrams(libros[[1]], n = 6, n_min = 1)
+ngrama[[1]]</code></pre>
+<pre><code>## [1] &quot;divina&quot;                   &quot;divina comedia&quot;          
+## [3] &quot;divina comedia por&quot;       &quot;divina comedia por dante&quot;
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 11 entries ]</code></pre>
+<p>Veamos el mismo caso omitiendo palabras vacías:</p>
+<pre class="r"><code>ngrama_stopwords &lt;- tokenize_ngrams(libros[[1]], n = 6, n_min = 1, stopwords = stopwords::stopwords(&quot;es&quot;))
+ngrama_stopwords[[1]]</code></pre>
+<pre><code>## [1] &quot;divina&quot;                         &quot;divina comedia&quot;                
+## [3] &quot;divina comedia dante&quot;           &quot;divina comedia dante alighieri&quot;
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 6 entries ]</code></pre>
+<p>A raíz de esto surge también la opción de tomar <em>n-gramas</em> con
+<em>k-saltos</em>: como su propio nombre indica, hace lo mismo que el
+proceso de tomar <em>n-gramas</em>, pero con la opción de omitir entre
+<em>0</em> y <em>k</em> palabras en el <em>n-grama</em>, en lugar de
+tomar subsecuencias con todas las palabras contiguas. De nuevo, es
+posible incluir una lista de palabras vacías que evitar en el
+proceso.</p>
+<pre class="r"><code>ngrama_salto &lt;- tokenize_skip_ngrams(libros[[1]], n = 3, n_min = 1, k = 1)
+ngrama_salto[[1]]</code></pre>
+<pre><code>## [1] &quot;divina&quot;             &quot;divina comedia&quot;     &quot;divina por&quot;        
+## [4] &quot;divina comedia por&quot;
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 16 entries ]</code></pre>
+<pre class="r"><code>ngrama_salto_stopwords &lt;- tokenize_skip_ngrams(libros[[1]], n = 3, n_min = 1, k = 1, stopwords = stopwords::stopwords(&quot;es&quot;))
+ngrama_salto_stopwords[[1]]</code></pre>
+<pre><code>## [1] &quot;divina&quot;               &quot;divina comedia&quot;       &quot;divina dante&quot;        
+## [4] &quot;divina comedia dante&quot;
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 9 entries ]</code></pre>
 </div>
-<div id="analizando-los-datos." class="section level2">
-<h2>Analizando los datos.</h2>
+<div id="analizando-los-datos" class="section level2">
+<h2>Analizando los datos</h2>
 <p>asfdasf</p>
 </div>
 </div>
