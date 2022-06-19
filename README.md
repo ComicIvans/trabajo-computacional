@@ -11,7 +11,7 @@ Las obras que se han escogido son:
 - **Teatro:**
   - La vida es sueño.
 
-El resultado se puede consultar en [este enlace](https://comicivans.github.io/trabajo-computacional/Trabajo.html).
+El resultado se puede consultar en [este enlace](https://comicivans.github.io/trabajo-computacional/).
 
 Trabajo realizado por:
 - Pedro Alumbreros Menchén.
