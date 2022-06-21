@@ -16,7 +16,7 @@ Las obras que se han escogido son:
 El resultado se puede consultar en [este enlace](https://comicivans.github.io/trabajo-computacional/).
 
 Trabajo realizado por:
-- Pedro Alumbreros Menchén.
-- Elena Merelo Molina
-- Iván Salido Cobo
-- Rubén Vílchez Valenzuela
+- **Pedro Alumbreros Menchén**
+- **Elena Merelo Molina**
+- **Iván Salido Cobo**
+- **Rubén Vílchez Valenzuela**

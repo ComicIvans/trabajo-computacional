@@ -1497,18 +1497,17 @@ Prism.languages.r={comment:/#.*/,string:{pattern:/(['"])(?:\\.|(?!\1)[^\\\r\n])*
         <div class="Sidebar">
           <div class="SidebarItems" id="toc">
             <ul>
-            <li><a href="#análisis-del-texto-de-distintas-obras-de-prosa-poesía-y-teatro-del-siglo-de-oro-español"><strong>Análisis
+            <li><a href="#análisis-del-texto-de-distintas-obras-de-prosa-poesía-y-teatro-del-siglo-de-oro-español">Análisis
             del texto de distintas obras de prosa, poesía y teatro del
-            Siglo de Oro español</strong></a>
+            Siglo de Oro español</a>
             <ul>
-            <li><a href="#paquetes-utilizados"><strong>Paquetes
-            utilizados</strong></a></li>
-            <li><a href="#leyendo-los-pdfs"><strong>Leyendo los
-            PDFs</strong></a></li>
-            <li><a href="#preparando-los-datos"><strong>Preparando los
-            datos</strong></a></li>
-            <li><a href="#analizando-los-datos"><strong>Analizando los
-            datos</strong></a></li>
+            <li><a href="#paquetes-utilizados">Paquetes
+            utilizados</a></li>
+            <li><a href="#leyendo-los-pdfs">Leyendo los PDFs</a></li>
+            <li><a href="#preparando-los-datos">Preparando los
+            datos</a></li>
+            <li><a href="#analizando-los-datos">Analizando los
+            datos</a></li>
             </ul></li>
             </ul>
           </div>
@@ -1535,8 +1534,8 @@ Vílchez Valenzuela
 <!-- Don't indent these lines or it will mess pre blocks indentation --> 
 <div class="page-content has-page-title">
 <div id="análisis-del-texto-de-distintas-obras-de-prosa-poesía-y-teatro-del-siglo-de-oro-español" class="section level1">
-<h1><strong>Análisis del texto de distintas obras de prosa, poesía y
-teatro del Siglo de Oro español</strong></h1>
+<h1>Análisis del texto de distintas obras de prosa, poesía y teatro del
+Siglo de Oro español</h1>
 <p>El objetivo es analizar las principales diferencias entre las obras
 más famosas de prosa, poesía y teatro escritas en España durante el
 siglo XVII.</p>
@@ -1563,7 +1562,7 @@ Cervantes)</em></li>
 <p>Además, se utilizará un pequeño repertorio de poemas de Quevedo para
 mostrar el uso de los paquetes.</p>
 <div id="paquetes-utilizados" class="section level2">
-<h2><strong>Paquetes utilizados</strong></h2>
+<h2>Paquetes utilizados</h2>
 <p>Como las obras están en PDF, se hará uso del paquete
 <code>pdftools</code> para extraer el texto.</p>
 <p>Después, se usarán los paquetes <code>tokenizers</code> y
@@ -1587,7 +1586,7 @@ library(tidyverse)</code></pre>
 ## ✖ dplyr::lag()    masks stats::lag()</code></pre>
 </div>
 <div id="leyendo-los-pdfs" class="section level2">
-<h2><strong>Leyendo los PDFs</strong></h2>
+<h2>Leyendo los PDFs</h2>
 <p>En una lista se almacenan los PDFs que haya en el directorio de
 trabajo. El paguete <code>pdftools</code> permite leer el texto de un
 PDF con la función <code>pdf_text</code>. Se continúa leyendo el texto
@@ -1635,7 +1634,7 @@ cat(strtrim(libros$ParnasoEspañol, 950))</code></pre>
 ## </code></pre>
 </div>
 <div id="preparando-los-datos" class="section level2">
-<h2><strong>Preparando los datos</strong></h2>
+<h2>Preparando los datos</h2>
 <p>Ahora es necesario <em>tokenizar</em> el texto leído.</p>
 <p>El proceso de <em>tokenización</em> consiste en descomponer una
 cadena de texto en <em>tokens</em>, esto es, elementos más pequeños
@@ -1829,9 +1828,57 @@ proceso.</p>
 ## [16] &quot;nariz érase&quot;         &quot;nariz hombre&quot;        &quot;nariz érase hombre&quot; 
 ## [19] &quot;nariz érase nariz&quot;   &quot;nariz hombre nariz&quot; 
 ##  [ reached getOption(&quot;max.print&quot;) -- omitted 3185 entries ]</code></pre>
+<p>Para el este estudio, se usarán como <em>tokens</em> todas las
+palabras eliminando las palabras vacías.</p>
+<pre class="r"><code>libros_tokenizados &lt;- list()
+for (libro in libros) {
+  libros_tokenizados &lt;- append(libros_tokenizados, tokenize_words(libro, stopwords = stopwords::stopwords(&quot;es&quot;)))
+}
+libros_tokenizados</code></pre>
+<pre><code>## [[1]]
+##  [1] &quot;v&quot;         &quot;estatua&quot;   &quot;bronce&quot;    &quot;santo&quot;     &quot;rey&quot;       &quot;don&quot;      
+##  [7] &quot;felipe&quot;    &quot;iii&quot;       &quot;casa&quot;      &quot;campo&quot;     &quot;madrid&quot;    &quot;traída&quot;   
+## [13] &quot;florencia&quot; &quot;oh&quot;        &quot;cuánta&quot;    &quot;majestad&quot;  &quot;oh&quot;        &quot;cuánto&quot;   
+## [19] &quot;numen&quot;     &quot;tercer&quot;   
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 18412 entries ]
+## 
+## [[2]]
+##  [1] &quot;hablan&quot;     &quot;personas&quot;   &quot;siguientes&quot; &quot;diana&quot;      &quot;condesa&quot;   
+##  [6] &quot;belflor&quot;    &quot;leonido&quot;    &quot;criado&quot;     &quot;conde&quot;      &quot;federico&quot;  
+## [11] &quot;antonelo&quot;   &quot;lacayo&quot;     &quot;teodoro&quot;    &quot;secretario&quot; &quot;marcela&quot;   
+## [16] &quot;cámara&quot;     &quot;dorotea&quot;    &quot;cámara&quot;     &quot;anarda&quot;     &quot;cámara&quot;    
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 10246 entries ]
+## 
+## [[3]]
+##  [1] &quot;capítulo&quot;  &quot;i&quot;         &quot;trata&quot;     &quot;condición&quot; &quot;ejercicio&quot; &quot;famoso&quot;   
+##  [7] &quot;hidalgo&quot;   &quot;don&quot;       &quot;quijote&quot;   &quot;mancha&quot;    &quot;lugar&quot;     &quot;mancha&quot;   
+## [13] &quot;cuyo&quot;      &quot;nombre&quot;    &quot;quiero&quot;    &quot;acordarme&quot; &quot;tiempo&quot;    &quot;vivía&quot;    
+## [19] &quot;hidalgo&quot;   &quot;lanza&quot;    
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 180291 entries ]
+## 
+## [[4]]
+##  [1] &quot;capítulo&quot;   &quot;i&quot;          &quot;cura&quot;       &quot;barbero&quot;    &quot;pasaron&quot;   
+##  [6] &quot;don&quot;        &quot;quijote&quot;    &quot;cerca&quot;      &quot;enfermedad&quot; &quot;cuenta&quot;    
+## [11] &quot;cide&quot;       &quot;hamete&quot;     &quot;benengeli&quot;  &quot;segunda&quot;    &quot;parte&quot;     
+## [16] &quot;desta&quot;      &quot;historia&quot;   &quot;tercera&quot;    &quot;salida&quot;     &quot;don&quot;       
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 92983 entries ]
+## 
+## [[5]]
+##  [1] &quot;dedicatoria&quot; &quot;duque&quot;       &quot;béjar&quot;       &quot;pasos&quot;       &quot;peregrino&quot;  
+##  [6] &quot;errante&quot;     &quot;cuantos&quot;     &quot;dictó&quot;       &quot;versos&quot;      &quot;dulce&quot;      
+## [11] &quot;musa&quot;        &quot;soledad&quot;     &quot;confusa&quot;     &quot;perdidos&quot;    &quot;inspirados&quot; 
+## [16] &quot;oh&quot;          &quot;venablos&quot;    &quot;impedido&quot;    &quot;5&quot;           &quot;muros&quot;      
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 7393 entries ]
+## 
+## [[6]]
+##  [1] &quot;personajes&quot; &quot;rosaura&quot;    &quot;dama&quot;       &quot;segismundo&quot; &quot;príncipe&quot;  
+##  [6] &quot;clotaldo&quot;   &quot;viejo&quot;      &quot;estrella&quot;   &quot;infanta&quot;    &quot;clarín&quot;    
+## [11] &quot;gracioso&quot;   &quot;basilio&quot;    &quot;rey&quot;        &quot;polonia&quot;    &quot;astolfo&quot;   
+## [16] &quot;infante&quot;    &quot;guardias&quot;   &quot;soldados&quot;   &quot;músicos&quot;    &quot;primer&quot;    
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 9053 entries ]</code></pre>
 </div>
 <div id="analizando-los-datos" class="section level2">
-<h2><strong>Analizando los datos</strong></h2>
+<h2>Analizando los datos</h2>
 <p>asfdasf</p>
 </div>
 </div>

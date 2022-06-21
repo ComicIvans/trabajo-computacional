@@ -16,7 +16,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-# **Análisis del texto de distintas obras de prosa, poesía y teatro del Siglo de Oro español**
+# Análisis del texto de distintas obras de prosa, poesía y teatro del Siglo de Oro español
 El objetivo es analizar las principales diferencias entre las obras más famosas de prosa, poesía y teatro escritas en España durante el siglo XVII.
 
 Las obras escogidas son:
@@ -33,7 +33,7 @@ Las obras escogidas son:
 
 Además, se utilizará un pequeño repertorio de poemas de Quevedo para mostrar el uso de los paquetes.
 
-## **Paquetes utilizados**
+## Paquetes utilizados
 
 Como las obras están en PDF, se hará uso del paquete `pdftools` para extraer el texto.
 
@@ -49,7 +49,7 @@ library(stopwords)
 library(tidyverse)
 ```
 
-## **Leyendo los PDFs**
+## Leyendo los PDFs
 
 En una lista se almacenan los PDFs que haya en el directorio de trabajo. El paguete `pdftools` permite leer el texto de un PDF con la función `pdf_text`. Se continúa leyendo el texto de todos los PDFs utilizando `lapply`. Por último, se almacenan los poemas de prueba.
 
@@ -75,7 +75,7 @@ names(libros) <- c("ParnasoEspañol", "PerroHortelano", "Quijote1", "Quijote2", 
 cat(strtrim(libros$ParnasoEspañol, 950))
 ```
 
-## **Preparando los datos**
+## Preparando los datos
 
 Ahora es necesario *tokenizar* el texto leído.
 
@@ -146,7 +146,16 @@ tokenize_skip_ngrams(poemas_prueba, n = 3, n_min = 1, k = 1)
 tokenize_skip_ngrams(poemas_prueba, n = 3, n_min = 1, k = 1, stopwords = stopwords::stopwords("es"))
 ```
 
+Para el este estudio, se usarán como *tokens* todas las palabras eliminando las palabras vacías.
 
-## **Analizando los datos**
+```{r }
+libros_tokenizados <- list()
+for (libro in libros) {
+  libros_tokenizados <- append(libros_tokenizados, tokenize_words(libro, stopwords = stopwords::stopwords("es")))
+}
+libros_tokenizados
+```
+
+## Analizando los datos
 
 asfdasf
