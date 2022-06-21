@@ -4,12 +4,14 @@ El trabajo consiste en realizar un documento tipo *vignette* en el que se van a 
 Las obras que se han escogido son:
 
 - **Prosa:**
-  - El ingenioso hidalgo Don Quijote de la Mancha.
-  - El ingenioso caballero Don Quijote de la Mancha.
+  - El ingenioso hidalgo Don Quijote de la Mancha *(Miguel de Cervantes)*
+  - El ingenioso caballero Don Quijote de la Mancha *(Miguel de Cervantes)*
 - **Poesía:**
-  - La Divina comedia.
+  - El Parnaso Español *(Francisco Gómez de Quevedo)*
+  - Soledades *(Luis de Góngora)*
 - **Teatro:**
-  - La vida es sueño.
+  - La vida es sueño *(Pedro Calderón de la Barca)*
+  - El perro del hortelano *(Félix Lope de Vega)*
 
 El resultado se puede consultar en [este enlace](https://comicivans.github.io/trabajo-computacional/).
 
