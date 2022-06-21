@@ -41,7 +41,7 @@
 #' 
 #' Por último, se analizarán los datos resultantes con el paquete `tidyverse`.
 
-options(max.print = 20)
+options(max.print = 20) # Para evitar que se impriman los libros enteros.
 library(pdftools)
 library(tokenizers)
 library(stopwords)

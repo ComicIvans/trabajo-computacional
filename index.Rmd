@@ -42,7 +42,7 @@ Después, se usarán los paquetes `tokenizers` y `stopwords` para descomponer el
 Por último, se analizarán los datos resultantes con el paquete `tidyverse`.
 
 ```{r }
-options(max.print = 20)
+options(max.print = 20) # Para evitar que se impriman los libros enteros.
 library(pdftools)
 library(tokenizers)
 library(stopwords)
