@@ -153,6 +153,7 @@ libros_tokenizados <- list()
 for (libro in libros) {
   libros_tokenizados <- append(libros_tokenizados, tokenize_words(libro, stopwords = stopwords::stopwords("es")))
 }
+names(libros_tokenizados) <- c("ParnasoEspañol", "PerroHortelano", "Quijote1", "Quijote2", "Soledades", "VidaEsSueño")
 libros_tokenizados
 ```
 
