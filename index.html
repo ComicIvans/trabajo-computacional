@@ -7,7 +7,7 @@
 
         <meta name="author" content="Pedro Alumbreros Menchén, Elena Merelo Molina, Iván Salido Cobo y Rubén Vílchez Valenzuela" />
     
-        <meta name="date" content="2022-06-21" />
+        <meta name="date" content="2022-06-24" />
     
     <title>Trabajo final de Estadística Computacional</title>
 
@@ -1525,7 +1525,7 @@ Prism.languages.r={comment:/#.*/,string:{pattern:/(['"])(?:\\.|(?!\1)[^\\\r\n])*
 Alumbreros Menchén, Elena Merelo Molina, Iván Salido Cobo y Rubén
 Vílchez Valenzuela
       </p>
-         <p class="date"><span class="glyphicon glyphicon-calendar"></span> 2022-06-21</p>
+         <p class="date"><span class="glyphicon glyphicon-calendar"></span> 2022-06-24</p>
            
 
    
@@ -1877,10 +1877,41 @@ libros_tokenizados</code></pre>
 ## [11] &quot;gracioso&quot;   &quot;basilio&quot;    &quot;rey&quot;        &quot;polonia&quot;    &quot;astolfo&quot;   
 ## [16] &quot;infante&quot;    &quot;guardias&quot;   &quot;soldados&quot;   &quot;músicos&quot;    &quot;primer&quot;    
 ##  [ reached getOption(&quot;max.print&quot;) -- omitted 9053 entries ]</code></pre>
+<p>Por último, convertiremos el texto leído a factores para poder
+analizarlo correctamente.</p>
+<pre class="r"><code>libros_tokenizados &lt;- lapply(libros_tokenizados, factor)
+poemas_prueba &lt;- factor(tokenize_words(poemas_prueba, stopwords = stopwords::stopwords(&quot;es&quot;))[[1]])
+poemas_prueba</code></pre>
+<pre><code>##  [1] hombre      gran        nariz       érase       hombre      nariz      
+##  [7] pegado      érase       nariz       superlativa érase       alquitara  
+## [13] medio       viva        érase       peje        espada      mal        
+## [19] barbado     reloj      
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 440 entries ]
+## 351 Levels: abismo abrasador abrasaran acaso acompaña ahorcados algún ... zurdo</code></pre>
+<p>Uno de los paquetes incluídos con <code>tidyverse</code> es
+<code>forcats</code>, que nos permite manipular el texto como factores.
+En este caso, lo que vamos a hacer es organizar el texto en una tabla
+con cada palabra y sus repeticiones.</p>
+<pre class="r"><code>palabras &lt;- lapply(libros_tokenizados, fct_count)
+fct_count(poemas_prueba, sort = TRUE) # `sort` ordena las palabras de mayor número de repeticiones a menor.</code></pre>
+<pre><code>## # A tibble: 351 × 2
+##    f             n
+##    &lt;fct&gt;     &lt;int&gt;
+##  1 pues         11
+##  2 si           10
+##  3 érase         9
+##  4 caballero     7
+##  5 dinero        7
+##  6 don           7
+##  7 poderoso      7
+##  8 mal           5
+##  9 hace          4
+## 10 nariz         4
+## # … with 341 more rows</code></pre>
 </div>
 <div id="analizando-los-datos" class="section level2">
 <h2>Analizando los datos</h2>
-<p>asfdasf</p>
+<p>Vamos a observar las palabras más repetidas por obra.</p>
 </div>
 </div>
 </div>

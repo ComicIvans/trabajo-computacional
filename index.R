@@ -129,6 +129,17 @@ for (libro in libros) {
 names(libros_tokenizados) <- c("ParnasoEspañol", "PerroHortelano", "Quijote1", "Quijote2", "Soledades", "VidaEsSueño")
 libros_tokenizados
 
+#' Por último, convertiremos el texto leído a factores para poder analizarlo correctamente.
+
+libros_tokenizados <- lapply(libros_tokenizados, factor)
+poemas_prueba <- factor(tokenize_words(poemas_prueba, stopwords = stopwords::stopwords("es"))[[1]])
+poemas_prueba
+
+#' Uno de los paquetes incluídos con `tidyverse` es `forcats`, que nos permite manipular el texto como factores. En este caso, lo que vamos a hacer es organizar el texto en una tabla con cada palabra y sus repeticiones.
+
+palabras <- lapply(libros_tokenizados, fct_count)
+fct_count(poemas_prueba, sort = TRUE) # `sort` ordena las palabras de mayor número de repeticiones a menor.
+
 #' ## Analizando los datos
 #' 
-#' asfdasf
+#' Vamos a observar las palabras más repetidas por obra.
