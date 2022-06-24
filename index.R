@@ -49,7 +49,9 @@ library(tidyverse)
 
 #' ## Leyendo los PDFs
 #' 
-#' En una lista se almacenan los PDFs que haya en el directorio de trabajo. El paguete `pdftools` permite leer el texto de un PDF con la función `pdf_text`. Se continúa leyendo el texto de todos los PDFs utilizando `lapply`. Por último, se almacenan los poemas de prueba.
+#' Todas las obras estarán almacenadas en un *data frame* con el título, el autor y el texto.
+#'
+#' El paguete `pdftools` permite leer el texto de un PDF con la función `pdf_text`. Se continúa leyendo el texto de todos los PDFs utilizando `lapply`. Por último, se almacenan los poemas de prueba.
 
 pdfs <- list.files(pattern = "pdf$")
 libros <- lapply(pdfs, pdf_text)
@@ -65,9 +67,12 @@ poemas_prueba <- read_file("poemas-prueba.txt")
 leer_pdf <- function(pdf) {
   return(paste0(pdf_text(pdf), collapse = ""))
 }
-libros <- lapply(pdfs, leer_pdf)
-names(libros) <- c("ParnasoEspañol", "PerroHortelano", "Quijote1", "Quijote2", "Soledades", "VidaEsSueño")
-cat(strtrim(libros$ParnasoEspañol, 950))
+libros <- data.frame(
+  "titulo" = c("El Parnaso Español", "El perro del hortelano", "El Quijote 1", "El Quijote", "Soledades", "La vida es sueño"),
+  "autor" = c("Francisco Gómez de Quevedo", "Félix Lope de Vega", "Miguel de Cervantes", "Miguel de Cervantes", "Luis de Góngora", "Pedro Calderón de la Barca"),
+  "texto" = c(leer_pdf(pdfs[1]), leer_pdf(pdfs[2]), leer_pdf(pdfs[3]), leer_pdf(pdfs[4]), leer_pdf(pdfs[5]), leer_pdf(pdfs[6]))
+)
+cat(strtrim(libros$texto[1], 950)) # Mostramos solo una parte de la obra.
 
 #' ## Preparando los datos
 #' 
@@ -122,22 +127,22 @@ tokenize_skip_ngrams(poemas_prueba, n = 3, n_min = 1, k = 1, stopwords = stopwor
 
 #' Para el este estudio, se usarán como *tokens* todas las palabras eliminando las palabras vacías.
 
-libros_tokenizados <- list()
-for (libro in libros) {
-  libros_tokenizados <- append(libros_tokenizados, tokenize_words(libro, stopwords = stopwords::stopwords("es")))
+tokens <- list()
+for (libro in libros$texto) {
+  tokens <- append(tokens, tokenize_words(libro, stopwords = stopwords::stopwords("es")))
 }
-names(libros_tokenizados) <- c("ParnasoEspañol", "PerroHortelano", "Quijote1", "Quijote2", "Soledades", "VidaEsSueño")
-libros_tokenizados
+libros$tokens <- tokens
+libros$tokens
 
 #' Por último, convertiremos el texto leído a factores para poder analizarlo correctamente.
 
-libros_tokenizados <- lapply(libros_tokenizados, factor)
+libros$tokens <- lapply(libros$tokens, factor)
 poemas_prueba <- factor(tokenize_words(poemas_prueba, stopwords = stopwords::stopwords("es"))[[1]])
 poemas_prueba
 
 #' Uno de los paquetes incluídos con `tidyverse` es `forcats`, que nos permite manipular el texto como factores. En este caso, lo que vamos a hacer es organizar el texto en una tabla con cada palabra y sus repeticiones.
 
-palabras <- lapply(libros_tokenizados, fct_count)
+libros$palabras <- lapply(libros$tokens, fct_count)
 fct_count(poemas_prueba, sort = TRUE) # `sort` ordena las palabras de mayor número de repeticiones a menor.
 
 #' ## Analizando los datos

@@ -1587,11 +1587,12 @@ library(tidyverse)</code></pre>
 </div>
 <div id="leyendo-los-pdfs" class="section level2">
 <h2>Leyendo los PDFs</h2>
-<p>En una lista se almacenan los PDFs que haya en el directorio de
-trabajo. El paguete <code>pdftools</code> permite leer el texto de un
-PDF con la función <code>pdf_text</code>. Se continúa leyendo el texto
-de todos los PDFs utilizando <code>lapply</code>. Por último, se
-almacenan los poemas de prueba.</p>
+<p>Todas las obras estarán almacenadas en un <em>data frame</em> con el
+título, el autor y el texto.</p>
+<p>El paguete <code>pdftools</code> permite leer el texto de un PDF con
+la función <code>pdf_text</code>. Se continúa leyendo el texto de todos
+los PDFs utilizando <code>lapply</code>. Por último, se almacenan los
+poemas de prueba.</p>
 <pre class="r"><code>pdfs &lt;- list.files(pattern = &quot;pdf$&quot;)
 libros &lt;- lapply(pdfs, pdf_text)
 poemas_prueba &lt;- read_file(&quot;poemas-prueba.txt&quot;)</code></pre>
@@ -1606,9 +1607,12 @@ leerá el texto del PDF y lo juntará antes de devolverlo.</p>
 <pre class="r"><code>leer_pdf &lt;- function(pdf) {
   return(paste0(pdf_text(pdf), collapse = &quot;&quot;))
 }
-libros &lt;- lapply(pdfs, leer_pdf)
-names(libros) &lt;- c(&quot;ParnasoEspañol&quot;, &quot;PerroHortelano&quot;, &quot;Quijote1&quot;, &quot;Quijote2&quot;, &quot;Soledades&quot;, &quot;VidaEsSueño&quot;)
-cat(strtrim(libros$ParnasoEspañol, 950))</code></pre>
+libros &lt;- data.frame(
+  &quot;titulo&quot; = c(&quot;El Parnaso Español&quot;, &quot;El perro del hortelano&quot;, &quot;El Quijote 1&quot;, &quot;El Quijote&quot;, &quot;Soledades&quot;, &quot;La vida es sueño&quot;),
+  &quot;autor&quot; = c(&quot;Francisco Gómez de Quevedo&quot;, &quot;Félix Lope de Vega&quot;, &quot;Miguel de Cervantes&quot;, &quot;Miguel de Cervantes&quot;, &quot;Luis de Góngora&quot;, &quot;Pedro Calderón de la Barca&quot;),
+  &quot;texto&quot; = c(leer_pdf(pdfs[1]), leer_pdf(pdfs[2]), leer_pdf(pdfs[3]), leer_pdf(pdfs[4]), leer_pdf(pdfs[5]), leer_pdf(pdfs[6]))
+)
+cat(strtrim(libros$texto[1], 950)) # Mostramos solo una parte de la obra.</code></pre>
 <pre><code>##                                    -V-
 ## A la estatua de bronce del Santo Rey Don Felipe III, que está en la casa
 ##                del campo de Madrid, traída de Florencia
@@ -1830,48 +1834,48 @@ proceso.</p>
 ##  [ reached getOption(&quot;max.print&quot;) -- omitted 3185 entries ]</code></pre>
 <p>Para el este estudio, se usarán como <em>tokens</em> todas las
 palabras eliminando las palabras vacías.</p>
-<pre class="r"><code>libros_tokenizados &lt;- list()
-for (libro in libros) {
-  libros_tokenizados &lt;- append(libros_tokenizados, tokenize_words(libro, stopwords = stopwords::stopwords(&quot;es&quot;)))
+<pre class="r"><code>tokens &lt;- list()
+for (libro in libros$texto) {
+  tokens &lt;- append(tokens, tokenize_words(libro, stopwords = stopwords::stopwords(&quot;es&quot;)))
 }
-names(libros_tokenizados) &lt;- c(&quot;ParnasoEspañol&quot;, &quot;PerroHortelano&quot;, &quot;Quijote1&quot;, &quot;Quijote2&quot;, &quot;Soledades&quot;, &quot;VidaEsSueño&quot;)
-libros_tokenizados</code></pre>
-<pre><code>## $ParnasoEspañol
+libros$tokens &lt;- tokens
+libros$tokens</code></pre>
+<pre><code>## [[1]]
 ##  [1] &quot;v&quot;         &quot;estatua&quot;   &quot;bronce&quot;    &quot;santo&quot;     &quot;rey&quot;       &quot;don&quot;      
 ##  [7] &quot;felipe&quot;    &quot;iii&quot;       &quot;casa&quot;      &quot;campo&quot;     &quot;madrid&quot;    &quot;traída&quot;   
 ## [13] &quot;florencia&quot; &quot;oh&quot;        &quot;cuánta&quot;    &quot;majestad&quot;  &quot;oh&quot;        &quot;cuánto&quot;   
 ## [19] &quot;numen&quot;     &quot;tercer&quot;   
 ##  [ reached getOption(&quot;max.print&quot;) -- omitted 18412 entries ]
 ## 
-## $PerroHortelano
+## [[2]]
 ##  [1] &quot;hablan&quot;     &quot;personas&quot;   &quot;siguientes&quot; &quot;diana&quot;      &quot;condesa&quot;   
 ##  [6] &quot;belflor&quot;    &quot;leonido&quot;    &quot;criado&quot;     &quot;conde&quot;      &quot;federico&quot;  
 ## [11] &quot;antonelo&quot;   &quot;lacayo&quot;     &quot;teodoro&quot;    &quot;secretario&quot; &quot;marcela&quot;   
 ## [16] &quot;cámara&quot;     &quot;dorotea&quot;    &quot;cámara&quot;     &quot;anarda&quot;     &quot;cámara&quot;    
 ##  [ reached getOption(&quot;max.print&quot;) -- omitted 10246 entries ]
 ## 
-## $Quijote1
+## [[3]]
 ##  [1] &quot;capítulo&quot;  &quot;i&quot;         &quot;trata&quot;     &quot;condición&quot; &quot;ejercicio&quot; &quot;famoso&quot;   
 ##  [7] &quot;hidalgo&quot;   &quot;don&quot;       &quot;quijote&quot;   &quot;mancha&quot;    &quot;lugar&quot;     &quot;mancha&quot;   
 ## [13] &quot;cuyo&quot;      &quot;nombre&quot;    &quot;quiero&quot;    &quot;acordarme&quot; &quot;tiempo&quot;    &quot;vivía&quot;    
 ## [19] &quot;hidalgo&quot;   &quot;lanza&quot;    
 ##  [ reached getOption(&quot;max.print&quot;) -- omitted 180291 entries ]
 ## 
-## $Quijote2
+## [[4]]
 ##  [1] &quot;capítulo&quot;   &quot;i&quot;          &quot;cura&quot;       &quot;barbero&quot;    &quot;pasaron&quot;   
 ##  [6] &quot;don&quot;        &quot;quijote&quot;    &quot;cerca&quot;      &quot;enfermedad&quot; &quot;cuenta&quot;    
 ## [11] &quot;cide&quot;       &quot;hamete&quot;     &quot;benengeli&quot;  &quot;segunda&quot;    &quot;parte&quot;     
 ## [16] &quot;desta&quot;      &quot;historia&quot;   &quot;tercera&quot;    &quot;salida&quot;     &quot;don&quot;       
 ##  [ reached getOption(&quot;max.print&quot;) -- omitted 92983 entries ]
 ## 
-## $Soledades
+## [[5]]
 ##  [1] &quot;dedicatoria&quot; &quot;duque&quot;       &quot;béjar&quot;       &quot;pasos&quot;       &quot;peregrino&quot;  
 ##  [6] &quot;errante&quot;     &quot;cuantos&quot;     &quot;dictó&quot;       &quot;versos&quot;      &quot;dulce&quot;      
 ## [11] &quot;musa&quot;        &quot;soledad&quot;     &quot;confusa&quot;     &quot;perdidos&quot;    &quot;inspirados&quot; 
 ## [16] &quot;oh&quot;          &quot;venablos&quot;    &quot;impedido&quot;    &quot;5&quot;           &quot;muros&quot;      
 ##  [ reached getOption(&quot;max.print&quot;) -- omitted 7393 entries ]
 ## 
-## $VidaEsSueño
+## [[6]]
 ##  [1] &quot;personajes&quot; &quot;rosaura&quot;    &quot;dama&quot;       &quot;segismundo&quot; &quot;príncipe&quot;  
 ##  [6] &quot;clotaldo&quot;   &quot;viejo&quot;      &quot;estrella&quot;   &quot;infanta&quot;    &quot;clarín&quot;    
 ## [11] &quot;gracioso&quot;   &quot;basilio&quot;    &quot;rey&quot;        &quot;polonia&quot;    &quot;astolfo&quot;   
@@ -1879,7 +1883,7 @@ libros_tokenizados</code></pre>
 ##  [ reached getOption(&quot;max.print&quot;) -- omitted 9053 entries ]</code></pre>
 <p>Por último, convertiremos el texto leído a factores para poder
 analizarlo correctamente.</p>
-<pre class="r"><code>libros_tokenizados &lt;- lapply(libros_tokenizados, factor)
+<pre class="r"><code>libros$tokens &lt;- lapply(libros$tokens, factor)
 poemas_prueba &lt;- factor(tokenize_words(poemas_prueba, stopwords = stopwords::stopwords(&quot;es&quot;))[[1]])
 poemas_prueba</code></pre>
 <pre><code>##  [1] hombre      gran        nariz       érase       hombre      nariz      
@@ -1892,7 +1896,7 @@ poemas_prueba</code></pre>
 <code>forcats</code>, que nos permite manipular el texto como factores.
 En este caso, lo que vamos a hacer es organizar el texto en una tabla
 con cada palabra y sus repeticiones.</p>
-<pre class="r"><code>palabras &lt;- lapply(libros_tokenizados, fct_count)
+<pre class="r"><code>libros$palabras &lt;- lapply(libros$tokens, fct_count)
 fct_count(poemas_prueba, sort = TRUE) # `sort` ordena las palabras de mayor número de repeticiones a menor.</code></pre>
 <pre><code>## # A tibble: 351 × 2
 ##    f             n
