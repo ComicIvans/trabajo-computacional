@@ -39,7 +39,7 @@ Como las obras están en PDF, se hará uso del paquete `pdftools` para extraer e
 
 Después, se usarán los paquetes `tokenizers` y `stopwords` para descomponer el texto y filtrar ciertas palabras.
 
-Por último, se analizarán los datos resultantes con el paquete `tidyverse`.
+Por último, se analizarán los datos resultantes con `tidyverse`, una librería que incluye varios paquetess.
 
 ```{r }
 options(max.print = 20) # Para evitar que se impriman los libros enteros.
@@ -51,8 +51,6 @@ library(tidyverse)
 
 ## Leyendo los PDFs
 
-Todas las obras estarán almacenadas en un *data frame* con el título, el autor y el texto.
-
 El paguete `pdftools` permite leer el texto de un PDF con la función `pdf_text`. Se continúa leyendo el texto de todos los PDFs utilizando `lapply`. Por último, se almacenan los poemas de prueba.
 
 ```{r }
@@ -61,22 +59,21 @@ libros <- lapply(pdfs, pdf_text)
 poemas_prueba <- read_file("poemas-prueba.txt")
 ```
 
-Donde `libros` es una lista con los PDFs. Cada elemento de la lista (cada libro)
+Donde `libros` es una lista con los PDFs. Cada elemento de la lista *(cada libro)*
 es un vector con tantos elementos como páginas tenga el PDF y en cada elemento
 el texto que haya en esa página del PDF.
 
 Esto, sin embargo, es un inconveniente, ya que para analizar correctamente cada libro, no debería estar el texto separado por páginas, sino todo junto.
-Para solucionarlo, se define una función que leerá el texto del PDF y lo juntará antes de devolverlo.
+Para solucionarlo, añadiremos los datos a un *data frame* y juntaremos el texto de todas las páginas.
 
 ```{r }
-leer_pdf <- function(pdf) {
-  return(paste0(pdf_text(pdf), collapse = ""))
+libros <- data.frame(matrix(ncol = 3, nrow = 0))
+colnames(libros) <- c("titulo", "autor", "texto")
+for (pdf in pdfs) {
+  info <- pdf_info(pdf)
+  libros[nrow(libros) + 1,] <- c(info$keys$Title, info$keys$Author, str_c(pdf_text(pdf), collapse = ""))
 }
-libros <- data.frame(
-  "titulo" = c("El Parnaso Español", "El perro del hortelano", "El Quijote 1", "El Quijote", "Soledades", "La vida es sueño"),
-  "autor" = c("Francisco Gómez de Quevedo", "Félix Lope de Vega", "Miguel de Cervantes", "Miguel de Cervantes", "Luis de Góngora", "Pedro Calderón de la Barca"),
-  "texto" = c(leer_pdf(pdfs[1]), leer_pdf(pdfs[2]), leer_pdf(pdfs[3]), leer_pdf(pdfs[4]), leer_pdf(pdfs[5]), leer_pdf(pdfs[6]))
-)
+
 cat(strtrim(libros$texto[1], 950)) # Mostramos solo una parte de la obra.
 ```
 
@@ -93,7 +90,6 @@ Con la función `tokenize_words` se extraen y se almacenan las palabras.
 tokenize_words(poemas_prueba)
 ```
 
-Donde `palab_lib` es una lista de vectores con todas las palabras de cada libro.
 A la hora de extraer las palabras, podemos además especificar un vector de palabras vacías *(palabras que no tienen un significado por sí solas, como pueden ser artículos, pronombres, preposiciones, adverbios, ...)*, que se omitirán.
 Para esto es útil el paquete `stopwords`, que contiene las palabras vacías o *stopwords* para distintos idiomas. El idioma se especifica como argumento en forma de su código ISO 639-1, por ejemplo, para el español, se usa el código `"es"`. Un ejemplo donde extraemos las palabras de un libro especificando palabras vacías del español con ayuda del paquete `stopwords`:
 
@@ -104,7 +100,7 @@ tokenize_words(poemas_prueba, stopwords = stopwords::stopwords("es"))
 Otra opción a la hora de analizar las palabras de un texto es tomar las raíces de las palabras en lugar de las palabras completas, lo cual da pie a más formas de estudiar un texto desde el punto de vista lingüístico. Esto se puede conseguir con ayuda de la función `tokenize_word_stems`:
 
 ```{r }
-tokenize_word_stems(poemas_prueba)
+tokenize_word_stems(poemas_prueba, language = "spanish")
 ```
 
 No solo nos quedamos en las palabras, si no que además podemos tomar el texto y separarlo en todas las letras que lo componen, que son los menores *tokens* que podremos encontrar.
@@ -151,32 +147,52 @@ tokenize_skip_ngrams(poemas_prueba, n = 3, n_min = 1, k = 1)
 tokenize_skip_ngrams(poemas_prueba, n = 3, n_min = 1, k = 1, stopwords = stopwords::stopwords("es"))
 ```
 
-Para el este estudio, se usarán como *tokens* todas las palabras eliminando las palabras vacías.
+Para el este estudio, se usarán como *tokens* todas las palabras eliminando las palabras vacías. Además, se eliminarán también los nombres de los personajes de las obras de teatro, que se han colocado en un documento de texto.
+
+Una cosa a tener en cuenta es que `tokenize_words` devuelve una lista con las palabras por documento *tokenizado*. Como solo estamos *tokenizando* un único texto cada vez que usamos la función, hay que poner `[[1]]` para sacar el texto de la lista.
 
 ```{r }
-tokens <- list()
-for (libro in libros$texto) {
-  tokens <- append(tokens, tokenize_words(libro, stopwords = stopwords::stopwords("es")))
+personajes <- tokenize_words(read_file("personajes.txt"))[[1]]
+
+for (i in 1:nrow(libros)) {
+  libros[i, "texto"] <- str_c(tokenize_words(libros[i, "texto"], stopwords = c(stopwords::stopwords("es"), personajes))[[1]], collapse = " ")
 }
-libros$tokens <- tokens
-libros$tokens
+head(libros)
 ```
 
-Por último, convertiremos el texto leído a factores para poder analizarlo correctamente.
+Lo que hemos hecho es juntar todos los *tokens* en un solo *string* separados por espacios.
+
+Para poder analizar la obras con mayor comodidad, vamos a separar cada *token* en una fila del *data frame*. La función `separate_rows` nos permite sacar todos los *tokens* separados por espacios a una fila individual.
 
 ```{r }
-libros$tokens <- lapply(libros$tokens, factor)
-poemas_prueba <- factor(tokenize_words(poemas_prueba, stopwords = stopwords::stopwords("es"))[[1]])
-poemas_prueba
-```
-
-Uno de los paquetes incluídos con `tidyverse` es `forcats`, que nos permite manipular el texto como factores. En este caso, lo que vamos a hacer es organizar el texto en una tabla con cada palabra y sus repeticiones.
-
-```{r }
-libros$palabras <- lapply(libros$tokens, fct_count)
-fct_count(poemas_prueba, sort = TRUE) # `sort` ordena las palabras de mayor número de repeticiones a menor.
+libros <- separate_rows(libros, texto, sep = "[[:space:]]")
+head(libros)
 ```
 
 ## Analizando los datos
 
-Vamos a observar las palabras más repetidas por obra.
+Pasamos a ver qué palabras se repiten más en los textos.
+
+```{r }
+libros %>% 
+  count(texto, sort = TRUE)
+```
+
+Visualizemos la palabra más frecuente por título. Usamos `slice` para *“cortar”* una porción de los datos de cada grupo. En este caso, sólo la primera fila, que por el orden establecido en el paso anterior, es la que tiene la palabra más frecuente:
+
+```{r }
+libros %>% 
+  filter(!is.na(titulo)) %>%
+  group_by(titulo) %>%
+  count(texto, sort = TRUE) %>%
+  slice(1) %>%
+  ggplot() +
+  geom_bar(aes(x = texto, weight = n, fill = texto)) +
+  coord_flip() +
+  facet_wrap(~titulo) +
+  labs(title = "Obras de literatura",
+       subtitle = "Palabra más frecuente por obra",
+       x = "palabra",
+       y = "veces hallada")
+```
+
