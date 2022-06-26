@@ -66,7 +66,7 @@ libros <- data.frame(matrix(ncol = 4, nrow = 0))
 colnames(libros) <- c("titulo", "autor", "texto", "n_palabras")
 for (pdf in pdfs) {
   info <- pdf_info(pdf)
-  libros[nrow(libros) + 1,] <- c(info$keys$Title, info$keys$Author, str_c(pdf_text(pdf), collapse = ""), 0)
+  libros[nrow(libros) + 1,] <- c(info$keys$Title, info$keys$Author, str_c(pdf_text(pdf), collapse = ""), NA)
 }
 
 cat(strtrim(libros$texto[1], 950)) # Mostramos solo una parte de la obra.
@@ -154,7 +154,13 @@ palabras_repetidas <- libros_separados %>%
 
 palabras_repetidas
 
+#' Para mostrar los datos en un gráfico, utilizaremos la función `ggplot`. A esa función hay que proporcionarle los datos a mostrar. Pedirle que muestre todas las palabras sería una locura, así que se mostrarán solo unas pocas. 
+#' 
 #' Usamos `slice_head` para *“cortar”* una porción de los datos de cada grupo. En este caso, sólo las primeras filas, que son las que tienen las palabras más frecuentes:
+#' 
+#' La función `ggplot` recibe también el tipo de gráfico, que será `geom_bar`, es decir, un gráfico de barras. `aes` indica la variable que se utilizará para el gráfico.
+#' 
+#' Por último `coord_flip` invierte las coordenadas para que las barras sean horizontales y `labs` genera la leyenda.
 
 palabras_repetidas %>%  
   slice_head(n = 20) %>%
@@ -184,6 +190,8 @@ libros_separados %>%
 #' Inmediatamente nos damos cuenta de un problema, en las obras del Quijote hay muchas más repeticiones porque la obra es más extensa, no necesariamente porque se repitan más veces esas palabras.
 #' 
 #' Para solucionarlo, podemos intentar ver en qué proporción se repiten esas palabras con respecto al total de palabras que tiene el libro.
+#' 
+#' La función `count` nos permite indicar unos pesos para cada observación, estos pesos serán `1 / n_palabras`, lo que nos dará la proporción de veces que aparece la palabra con el total de palabras que tiene la obra.
 
 libros_separados %>% 
   group_by(titulo) %>%

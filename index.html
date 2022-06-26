@@ -1606,7 +1606,7 @@ páginas, sino todo junto. Para solucionarlo, añadiremos los datos a un
 colnames(libros) &lt;- c(&quot;titulo&quot;, &quot;autor&quot;, &quot;texto&quot;, &quot;n_palabras&quot;)
 for (pdf in pdfs) {
   info &lt;- pdf_info(pdf)
-  libros[nrow(libros) + 1,] &lt;- c(info$keys$Title, info$keys$Author, str_c(pdf_text(pdf), collapse = &quot;&quot;), 0)
+  libros[nrow(libros) + 1,] &lt;- c(info$keys$Title, info$keys$Author, str_c(pdf_text(pdf), collapse = &quot;&quot;), NA)
 }
 
 cat(strtrim(libros$texto[1], 950)) # Mostramos solo una parte de la obra.</code></pre>
@@ -1892,9 +1892,19 @@ palabras_repetidas</code></pre>
 ##  9 así        1691
 ## 10 merced     1428
 ## # … with 28,156 more rows</code></pre>
+<p>Para mostrar los datos en un gráfico, utilizaremos la función
+<code>ggplot</code>. A esa función hay que proporcionarle los datos a
+mostrar. Pedirle que muestre todas las palabras sería una locura, así
+que se mostrarán solo unas pocas.</p>
 <p>Usamos <code>slice_head</code> para <em>“cortar”</em> una porción de
 los datos de cada grupo. En este caso, sólo las primeras filas, que son
 las que tienen las palabras más frecuentes:</p>
+<p>La función <code>ggplot</code> recibe también el tipo de gráfico, que
+será <code>geom_bar</code>, es decir, un gráfico de barras.
+<code>aes</code> indica la variable que se utilizará para el
+gráfico.</p>
+<p>Por último <code>coord_flip</code> invierte las coordenadas para que
+las barras sean horizontales y <code>labs</code> genera la leyenda.</p>
 <pre class="r"><code>palabras_repetidas %&gt;%  
   slice_head(n = 20) %&gt;%
   ggplot() +
@@ -1924,6 +1934,10 @@ Quijote hay muchas más repeticiones porque la obra es más extensa, no
 necesariamente porque se repitan más veces esas palabras.</p>
 <p>Para solucionarlo, podemos intentar ver en qué proporción se repiten
 esas palabras con respecto al total de palabras que tiene el libro.</p>
+<p>La función <code>count</code> nos permite indicar unos pesos para
+cada observación, estos pesos serán <code>1 / n_palabras</code>, lo que
+nos dará la proporción de veces que aparece la palabra con el total de
+palabras que tiene la obra.</p>
 <pre class="r"><code>libros_separados %&gt;% 
   group_by(titulo) %&gt;%
   count(texto, sort = TRUE, wt = 1 / as.numeric(n_palabras)) %&gt;%
