@@ -62,11 +62,11 @@ poemas_prueba <- read_file("poemas-prueba.txt")
 #' Esto, sin embargo, es un inconveniente, ya que para analizar correctamente cada libro, no debería estar el texto separado por páginas, sino todo junto.
 #' Para solucionarlo, añadiremos los datos a un *data frame* y juntaremos el texto de todas las páginas.
 
-libros <- data.frame(matrix(ncol = 3, nrow = 0))
-colnames(libros) <- c("titulo", "autor", "texto")
+libros <- data.frame(matrix(ncol = 4, nrow = 0))
+colnames(libros) <- c("titulo", "autor", "texto", "n_palabras")
 for (pdf in pdfs) {
   info <- pdf_info(pdf)
-  libros[nrow(libros) + 1,] <- c(info$keys$Title, info$keys$Author, str_c(pdf_text(pdf), collapse = ""))
+  libros[nrow(libros) + 1,] <- c(info$keys$Title, info$keys$Author, str_c(pdf_text(pdf), collapse = ""), 0)
 }
 
 cat(strtrim(libros$texto[1], 950)) # Mostramos solo una parte de la obra.
@@ -123,20 +123,23 @@ tokenize_skip_ngrams(poemas_prueba, n = 3, n_min = 1, k = 1, stopwords = stopwor
 
 #' Para el este estudio, se usarán como *tokens* todas las palabras eliminando las palabras vacías. Además, se eliminarán también los nombres de los personajes de las obras y algunas palabras más, que se han colocado en un documento de texto.
 #' 
+#' Después de *tokenizar* el texto, se guardará también la cantidad de palabras que quedan.
+#' 
 #' Una cosa a tener en cuenta es que `tokenize_words` devuelve una lista con las palabras por documento *tokenizado*. Como solo estamos *tokenizando* un único texto cada vez que usamos la función, hay que poner `[[1]]` para sacar el texto de la lista.
 
 palabras_extra <- tokenize_words(read_file("palabras_extra.txt"))[[1]]
 
 for (i in 1:nrow(libros)) {
   libros[i, "texto"] <- str_c(tokenize_words(libros[i, "texto"], stopwords = c(stopwords::stopwords("es"), palabras_extra))[[1]], collapse = " ")
+  libros[i, "n_palabras"] <- count_words(libros[i, "texto"])
 }
 
 #' Lo que hemos hecho es juntar todos los *tokens* en un solo *string* separados por espacios.
 #' 
 #' Para poder analizar la obras con mayor comodidad, vamos a separar cada *token* en una fila del *data frame*. La función `separate_rows` nos permite sacar todos los *tokens* separados por espacios a una fila individual.
 
-libros <- separate_rows(libros, texto, sep = "[[:space:]]")
-head(libros)
+libros_separados <- separate_rows(libros, texto, sep = "[[:space:]]")
+head(libros_separados)
 
 #' Lo que nos ha devuelto `head(libros)` es las primeras filas. Observamos que `libros` ya no es un *data frame*, sino un objeto llamado `tibble`,
 #' esto es una alternativa al *data frame* con la que trabajan los paquetes de `tidyverse`. La función `separate_rows` ha convertido automáticamente
@@ -145,13 +148,13 @@ head(libros)
 #' ## Analizando los datos
 #' 
 #' Pasamos a ver qué palabras se repiten más en los textos. Aquí vamos a utilizar el operador `%>%`, que le pasa la parte de la izquierda a la función de la derecha como primer parámetro.
-#' 
-#' Usamos `slice_head` para *“cortar”* una porción de los datos de cada grupo. En este caso, sólo las primeras filas, que son las que tienen las palabras más frecuentes:
 
-palabras_repetidas <- libros %>% 
+palabras_repetidas <- libros_separados %>% 
   count(texto, sort = TRUE)
 
 palabras_repetidas
+
+#' Usamos `slice_head` para *“cortar”* una porción de los datos de cada grupo. En este caso, sólo las primeras filas, que son las que tienen las palabras más frecuentes:
 
 palabras_repetidas %>%  
   slice_head(n = 20) %>%
@@ -165,7 +168,7 @@ palabras_repetidas %>%
  
 #' Visualizemos las palabras más frecuente por título.
 
-libros %>% 
+libros_separados %>% 
   group_by(titulo) %>%
   count(texto, sort = TRUE) %>%
   slice_head(n = 5) %>%
@@ -177,3 +180,20 @@ libros %>%
      subtitle = "Palabras más frecuentes por obra",
      x = "palabra",
      y = "veces hallada")
+
+#' Inmediatamente nos damos cuenta de un problema, en las obras del Quijote hay muchas más repeticiones porque la obra es más extensa, no necesariamente porque se repitan más veces esas palabras.
+#' 
+#' Para solucionarlo, podemos intentar ver en qué proporción se repiten esas palabras con respecto al total de palabras que tiene el libro.
+
+libros_separados %>% 
+  group_by(titulo) %>%
+  count(texto, sort = TRUE, wt = 1 / as.numeric(n_palabras)) %>%
+  slice_head(n = 5) %>%
+  ggplot() +
+  geom_bar(aes(x = texto, weight = n, fill = texto)) +
+  coord_flip() +
+  facet_wrap(~titulo) +
+  labs(title = "Obras de literatura",
+       subtitle = "Proporción de palabras más frecuentes por obra",
+       x = "palabra",
+       y = "proporción hallada")
