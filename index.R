@@ -138,20 +138,24 @@ for (i in 1:nrow(libros)) {
 libros <- separate_rows(libros, texto, sep = "[[:space:]]")
 head(libros)
 
+#' Lo que nos ha devuelto `head(libros)` es las primeras filas. Observamos que `libros` ya no es un *data frame*, sino un objeto llamado `tibble`,
+#' esto es una alternativa al *data frame* con la que trabajan los paquetes de `tidyverse`. La función `separate_rows` ha convertido automáticamente
+#' el *data frame* a `tibble`.
+#' 
 #' ## Analizando los datos
 #' 
 #' Pasamos a ver qué palabras se repiten más en los textos.
 
 libros %>% 
   count(texto, sort = TRUE)
-
-#' Visualizemos la palabra más frecuente por título. Usamos `slice` para *“cortar”* una porción de los datos de cada grupo. En este caso, sólo la primera fila, que por el orden establecido en el paso anterior, es la que tiene la palabra más frecuente:
+ 
+#' Visualizemos la palabra más frecuente por título. Usamos `slice` para *“cortar”* una porción de los datos de cada grupo. En este caso, sólo las primeras filas, que por el orden establecido en el paso anterior, son las que tienen las palabras más frecuentes:
 
 libros %>% 
   filter(!is.na(titulo)) %>%
   group_by(titulo) %>%
   count(texto, sort = TRUE) %>%
-  slice(1) %>%
+  slice(5) %>%
   ggplot() +
   geom_bar(aes(x = texto, weight = n, fill = texto)) +
   coord_flip() +
