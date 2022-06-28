@@ -20,3 +20,5 @@ Trabajo realizado por:
 - **Elena Merelo Molina**
 - **Iván Salido Cobo**
 - **Rubén Vílchez Valenzuela**
+
+**NOTA:** Tarda entre 15 y 20 minutillos en generar el documento html.

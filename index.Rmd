@@ -244,3 +244,122 @@ libros_separados %>%
        y = "proporción hallada")
 ```
 
+Vovemos a fijarnos en algo extraño, y es que no parece que se hayan contado las palabras bien en algunas obras. Por ejemplo, la gráfica nos dice que en ninguno de los libros del Quijote aparece la palabra *"sol"*, esto no tiene sentido, pues si buscamos manualmente en el documento veremos que sí aparece.
+
+Para entender el problema hay que analizar los datos que le estamos pasando a la gráfica para mostrar.
+
+```{r }
+libros_separados %>% 
+  group_by(titulo) %>%
+  count(texto, sort = TRUE)
+```
+
+Comparamos la diferencia de contar las palabras habiendo agrupado por título y sin haberlo hecho *(que tenemos un poco más arriba en la variable `palabras repetidas`)*.
+
+Entonces, lo que hace `group_by` es que las palabras se cuenten por libro, no en general.
+
+Veamos nuevamente cómo quedan ordeandas las palabras con los pesos, ya que nos interesa ver qué palabra aparece más en proporción, no simplemente porque haya obras más largas que otras.
+
+```{r }
+libros_separados %>% 
+  count(texto, sort = TRUE, wt = 1 / as.numeric(n_palabras))
+```
+
+Comparamos el resultado agrupando por título.
+
+```{r }
+libros_separados %>% 
+  group_by(titulo) %>%
+  count(texto, sort = TRUE, wt = 1 / as.numeric(n_palabras))
+```
+
+Vemos que, aplicando la proporción, no salen las mismas palabras que sin aplicarla. Nos queda comprobar qué hacen `slice` y `slice_head`.
+
+```{r }
+libros_separados %>% 
+  count(texto, sort = TRUE, wt = 1 / as.numeric(n_palabras)) %>%
+  slice_head(n = 5) # `slice_head` necesita especificar `n = 5`, `slice` permite poner el número directamente.
+
+libros_separados %>% 
+  count(texto, sort = TRUE, wt = 1 / as.numeric(n_palabras)) %>%
+  slice(5)
+```
+
+Así que `slice_head` nos devuelve los primeros *n* elementos, mientas que `slice` nos devuelve el elemento en la posición `n`. Para ver las principales palabras más repetidas nos interesará utilizar `slice_head`.
+
+Por último, veamos código completo que se le pasa a la gráfica.
+
+```{r }
+libros_separados %>% 
+  group_by(titulo) %>%
+  count(texto, sort = TRUE, wt = 1 / as.numeric(n_palabras)) %>%
+  slice_head(n = 5)
+```
+
+Y ahí está el problema, `slice_head` nos devuelve las *5* primeras palabras más repetidas en cada libro.
+Como no siempre son las mismas en cada libro, hay gráficas en las que no aparece la cantidad de repeticiones de una palabra porque no está entre las *5* más repetidas de ese libro.
+
+¿Cuál sería la solución? Primero hay que tener claro qué queremos mostrar. Queremos ver cuánto aparecen en cada libro las palabras más repetidas en general, es decir, buscar en cada libro las repeticiones de las *n* primeras palabras de `palabras_repetidas`:
+
+```{r }
+palabras_buscadas <- palabras_repetidas %>% slice_head(n = 10)
+```
+
+Vamos a intentar conseguir esas palabras en cada libro.
+
+```{r }
+libros_separados %>% 
+  group_by(titulo) %>%
+  count(texto, sort = TRUE, wt = 1 / as.numeric(n_palabras)) %>%
+  filter(texto %in% palabras_buscadas$texto) %>%
+  ggplot() +
+  geom_bar(aes(x = texto, weight = n, fill = texto)) +
+  coord_flip() +
+  facet_wrap(~titulo) +
+  labs(title = "Obras de literatura",
+       subtitle = "Proporción de palabras más frecuentes por obra",
+       x = "palabra",
+       y = "proporción hallada")
+```
+
+¡Y ahora sí que tienen mucho más sentido los resultados!
+
+Aun así, las palabras que aparecen como más repetitivas no tienen mucho interés, vamos a probar a coger palabras que estén entre las más repetidas pero sean las primeras. Aquí si usaremos `slice`:
+
+```{r }
+palabras_buscadas <- palabras_repetidas %>% slice(10:20)
+
+libros_separados %>% 
+  group_by(titulo) %>%
+  count(texto, sort = TRUE, wt = 1 / as.numeric(n_palabras)) %>%
+  filter(texto %in% palabras_buscadas$texto) %>%
+  ggplot() +
+  geom_bar(aes(x = texto, weight = n, fill = texto)) +
+  coord_flip() +
+  facet_wrap(~titulo) +
+  labs(title = "Obras de literatura",
+       subtitle = "Proporción de palabras más frecuentes por obra",
+       x = "palabra",
+       y = "proporción hallada")
+```
+
+Como curiosidad, podemos ver las palabras menos repetidas en vez de las más repetidas con `slice_tail`:
+
+```{r }
+palabras_buscadas <- palabras_repetidas %>% slice_tail(n = 15)
+
+libros_separados %>% 
+  group_by(titulo) %>%
+  count(texto, sort = TRUE, wt = 1 / as.numeric(n_palabras)) %>%
+  filter(texto %in% palabras_buscadas$texto) %>%
+  ggplot() +
+  geom_bar(aes(x = texto, weight = n, fill = texto)) +
+  coord_flip() +
+  facet_wrap(~titulo) +
+  labs(title = "Obras de literatura",
+       subtitle = "Proporción de palabras más frecuentes por obra",
+       x = "palabra",
+       y = "proporción hallada")
+```
+
+Curiosamente, todas las palabras menos repetidas empiezan por *"z"*.
